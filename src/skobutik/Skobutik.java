@@ -74,26 +74,28 @@ public class Skobutik {
     }
     
     public void läggBeställning(){
-        String input;
+        Map<Integer,String> alternatives = new HashMap<>();
+        List<String> stuff = new ArrayList<>();
+        String inputModellID;
+        String inputStorlek;
+        String inputFärg;
         skor = controller.getAllaSkor();
         System.out.println("\nVälj Modell:\n");
-        Map<Integer,String> modeller = new HashMap<>();
         skor.forEach((t) -> {
-            if(!modeller.containsValue(t.getNamn()))
-                modeller.put(t.getModellID(), t.getNamn());
+            alternatives.putIfAbsent(t.getModellID(), t.getNamn());
         });
-        modeller.entrySet().stream().forEach(m -> System.out.println("[" + m.getKey() + "] " + m.getValue()));
-//        controller.getAllaModellNamn()
-//                .entrySet()
-//                .stream()
-//                .forEach(m -> System.out.println("[" + m.getKey() + "] " + m.getValue()));
-//        System.out.println();
-//        input = scanner.nextLine();
-//        System.out.println("\nVälj Storlek:\n");
-//        controller.getStorlekarFörModell(input).forEach(s -> System.out.println(s));
-//        System.out.println();
-//        input = scanner.nextLine();
-        
+        alternatives.entrySet().stream().forEach(m -> System.out.println("[" + m.getKey() + "] " + m.getValue()));
+        System.out.println();
+        inputModellID = scanner.nextLine();
+        alternatives.clear();
+        System.out.println("\nVälj Storlek:\n");
+        stuff = skor.stream().filter(s -> String.valueOf(s.getModellID()).equalsIgnoreCase(inputModellID)).collect(Collectors.toList()).stream().map(t -> String.valueOf(t.getStorlek())).collect(Collectors.toSet()).stream().collect(Collectors.toList());
+        Collections.sort(stuff);
+        for (int i = 1; i <= stuff.size(); i++) {
+            alternatives.put(i, stuff.get(i-1));
+        }
+        alternatives.entrySet().stream().forEach(m -> System.out.println("[" + m.getKey() + "] " + m.getValue()));
+        // Gör en metod som printar Mappen.
     }
     
     public boolean login(){
