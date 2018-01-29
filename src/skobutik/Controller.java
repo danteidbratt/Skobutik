@@ -1,5 +1,6 @@
 package skobutik;
 
+import ViewModels.ViewSko;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,12 @@ public class Controller {
         return modellerPerKategori;
     }
     
+    public List<ViewSko> getAllaSkor(){
+        List<ViewSko> allaSkor = new ArrayList<>();
+        anslutning.getSkor("").forEach(s -> allaSkor.add(new ViewSko(s.getID(), s.getStorlek(), s.getFärg(), s.getAntal(),s.getModellID(), s.getNamn(), s.getPris(), s.getMärke(), s.getKategorier())));
+        return allaSkor;
+    }
+            
     public Map<Integer, String> getAllaModellNamn(){
         return anslutning.getModeller("").stream().collect(Collectors.toMap(t -> t.getModellID(), t -> t.getNamn()));
     }

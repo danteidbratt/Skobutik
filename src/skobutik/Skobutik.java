@@ -1,17 +1,21 @@
 package skobutik;
 
+import ViewModels.*;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Skobutik {
     
     Scanner scanner;
     Controller controller;
     int kundID;
+    List<ViewSko> skor;
 
     public Skobutik() {
         scanner = new Scanner(System.in);
         controller = new Controller();
+        skor = new ArrayList<>();
     }
     
     public void start() throws SQLException, ClassNotFoundException{
@@ -71,14 +75,25 @@ public class Skobutik {
     
     public void läggBeställning(){
         String input;
+        skor = controller.getAllaSkor();
         System.out.println("\nVälj Modell:\n");
-        controller.getAllaModellNamn()
-                .entrySet()
-                .stream()
-                .forEach(m -> System.out.println("[" + m.getKey() + "] " + m.getValue()));
-        input = scanner.nextLine();
-        System.out.println("\nVälj Storlek:\n");
-        controller.getStorlekarFörModell(input).forEach(s -> System.out.println(s));
+        Map<Integer,String> modeller = new HashMap<>();
+        skor.forEach((t) -> {
+            if(!modeller.containsValue(t.getNamn()))
+                modeller.put(t.getModellID(), t.getNamn());
+        });
+        modeller.entrySet().stream().forEach(m -> System.out.println("[" + m.getKey() + "] " + m.getValue()));
+//        controller.getAllaModellNamn()
+//                .entrySet()
+//                .stream()
+//                .forEach(m -> System.out.println("[" + m.getKey() + "] " + m.getValue()));
+//        System.out.println();
+//        input = scanner.nextLine();
+//        System.out.println("\nVälj Storlek:\n");
+//        controller.getStorlekarFörModell(input).forEach(s -> System.out.println(s));
+//        System.out.println();
+//        input = scanner.nextLine();
+        
     }
     
     public boolean login(){

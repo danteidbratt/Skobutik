@@ -49,4 +49,6 @@ public class Sko extends Modell{
     public void setAntal(int antal) {
         this.antal = antal;
     }
+    
+    
 }
