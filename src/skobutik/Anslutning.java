@@ -5,6 +5,8 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Anslutning {
 
@@ -279,10 +281,10 @@ public class Anslutning {
     
     public List<Beställning> getBeställningarIKund(int kundID){
         List<Beställning> allaBeställningar = new ArrayList<>();
-        String kundQuery = "select * from beställning where kundID = ?";
+        String query = "select * from beställning where kundID = ?";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
-            PreparedStatement stmt = con.prepareStatement(kundQuery);
+            PreparedStatement stmt = con.prepareStatement(query);
         ){
             stmt.setString(1, String.valueOf(kundID));
             ResultSet rs = stmt.executeQuery();
@@ -294,6 +296,22 @@ public class Anslutning {
             ex.printStackTrace();
         }
         return allaBeställningar;
+    }
+    
+    public int addToCart(String skoID, String beställningID, String kundID){
+        String query = "call AddToCart(?,?,?)";
+        int count = 0;
+        try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
+            CallableStatement stmt = con.prepareCall(query)
+        ){
+            stmt.setString(1, skoID);
+            stmt.setString(2, beställningID);
+            stmt.setString(3, kundID);
+            count = stmt.executeUpdate();
+        }   catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return count;
     }
     
     private boolean isInteger(String s){

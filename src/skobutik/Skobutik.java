@@ -76,26 +76,49 @@ public class Skobutik {
     public void läggBeställning(){
         Map<Integer,String> alternatives = new HashMap<>();
         List<String> stuff = new ArrayList<>();
-        String inputModellID;
+        String inputNamn;
         String inputStorlek;
         String inputFärg;
         skor = controller.getAllaSkor();
+        skor = skor.stream().filter(s -> s.getAntal() > 0).collect(Collectors.toList());
         System.out.println("\nVälj Modell:\n");
-        skor.forEach((t) -> {
-            alternatives.putIfAbsent(t.getModellID(), t.getNamn());
-        });
-        alternatives.entrySet().stream().forEach(m -> System.out.println("[" + m.getKey() + "] " + m.getValue()));
-        System.out.println();
-        inputModellID = scanner.nextLine();
-        alternatives.clear();
-        System.out.println("\nVälj Storlek:\n");
-        stuff = skor.stream().filter(s -> String.valueOf(s.getModellID()).equalsIgnoreCase(inputModellID)).collect(Collectors.toList()).stream().map(t -> String.valueOf(t.getStorlek())).collect(Collectors.toSet()).stream().collect(Collectors.toList());
-        Collections.sort(stuff);
-        for (int i = 1; i <= stuff.size(); i++) {
-            alternatives.put(i, stuff.get(i-1));
+        for (ViewSko vs : skor) {
+            if(!alternatives.containsValue(vs.getNamn()))
+                alternatives.put(vs.getModellID(), vs.getNamn());
         }
-        alternatives.entrySet().stream().forEach(m -> System.out.println("[" + m.getKey() + "] " + m.getValue()));
-        // Gör en metod som printar Mappen.
+        printAlternatives(alternatives);
+        inputNamn = alternatives.get(Integer.parseInt(scanner.nextLine()));
+        System.out.println("\nVälj Storlek:\n");
+        stuff = skor.stream()
+                .filter(s -> s.getNamn().equalsIgnoreCase(inputNamn))
+                .collect(Collectors.toList())
+                .stream()
+                .map(t -> String.valueOf(t.getStorlek()))
+                .collect(Collectors.toSet())
+                .stream()
+                .collect(Collectors.toList());
+        Collections.sort(stuff);
+        alternatives = generateMapFromList(stuff);
+        printAlternatives(alternatives);
+        inputStorlek = alternatives.get(Integer.parseInt(scanner.nextLine()));
+        skor = skor.stream()
+                .filter(s -> s.getStorlek() == Integer.parseInt(inputStorlek))
+                .collect(Collectors.toList());
+        stuff = skor.stream()
+                .map(ViewSko::getFärg)
+                .collect(Collectors.toSet())
+                .stream()
+                .collect(Collectors.toList());
+        System.out.println("\nVälj Färg:\n");
+        alternatives = generateMapFromList(stuff);
+        printAlternatives(alternatives);
+        inputFärg = alternatives.get(Integer.parseInt(scanner.nextLine()));
+        System.out.println("\nDitt val:\n" +
+                           "\nModel:  \t" + inputNamn +
+                           "\nStorlek:\t" + inputStorlek +
+                           "\nFärg:   \t" + inputFärg +
+                           "\n\n[1] Bekräfta" +
+                           "\n[2] Avbryt");
     }
     
     public boolean login(){
@@ -110,7 +133,21 @@ public class Skobutik {
             return true;
         return false;
     }
-
+    
+    public void printAlternatives(Map<Integer,String> alternatives){
+        alternatives.entrySet().stream().forEach(m -> System.out.println("[" + m.getKey() + "] " + m.getValue()));
+        System.out.println();
+    }
+    
+    public Map<Integer,String> generateMapFromList(List stuff){
+        Map<Integer,String> theMap = new HashMap<>();
+        for (int i = 0; i < stuff.size(); i++) {
+            theMap.put(i+1, (String)stuff.get(i));
+        }
+        stuff.clear();
+        return theMap;
+    }
+    
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         Skobutik skobutik = new Skobutik();
         while(true){
