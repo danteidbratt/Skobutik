@@ -2,12 +2,14 @@ package DbModell;
 
 public class Sko extends Modell{
     
+    private int skoID;
     private int storlek;
     private String färg;
     private int antal;
 
-    public Sko(int storlek, String färg, int antal, Modell modell) {
+    public Sko(int ID, int storlek, String färg, int antal, Modell modell) {
         super(modell.getModellID(), modell.getNamn(), modell.getPris(), modell.getMärke());
+        this.skoID = ID;
         this.storlek = storlek;
         this.färg = färg;
         this.antal = antal;
@@ -16,6 +18,14 @@ public class Sko extends Modell{
     public Sko() {
     }
 
+    public int getID() {
+        return skoID;
+    }
+
+    public void setID(int ID) {
+        this.skoID = ID;
+    }
+    
     public int getStorlek() {
         return storlek;
     }

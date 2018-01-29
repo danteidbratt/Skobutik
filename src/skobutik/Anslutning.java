@@ -195,7 +195,23 @@ public class Anslutning {
             ResultSet rs = stmt.executeQuery();
         ){
             while(rs.next()){
-                allaSkor.add(new Sko(getStorlekar(String.valueOf(rs.getInt("storlekID"))).get(0), getFärger(String.valueOf(rs.getInt("färgID"))).get(0), getLagerStatus(rs.getInt("ID")), getModeller(String.valueOf(rs.getInt("modellID"))).get(0)));
+                allaSkor.add(new Sko(rs.getInt("ID"), getStorlekar(String.valueOf(rs.getInt("storlekID"))).get(0), getFärger(String.valueOf(rs.getInt("färgID"))).get(0), getLagerStatus(rs.getInt("ID")), getModeller(String.valueOf(rs.getInt("modellID"))).get(0)));
+            }
+        }   catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return allaSkor;
+    }
+    
+    public List<Sko> getSkorAvSpecifikModell(String modellID){
+        List<Sko> allaSkor = new ArrayList<>();
+        String query = "select * from sko where modellID = " + modellID;
+        try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
+            PreparedStatement stmt = con.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+        ){
+            while(rs.next()){
+                allaSkor.add(new Sko(rs.getInt("ID"), getStorlekar(String.valueOf(rs.getInt("storlekID"))).get(0), getFärger(String.valueOf(rs.getInt("färgID"))).get(0), getLagerStatus(rs.getInt("ID")), getModeller(String.valueOf(rs.getInt("modellID"))).get(0)));
             }
         }   catch (SQLException ex) {
             ex.printStackTrace();

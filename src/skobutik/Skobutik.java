@@ -7,6 +7,7 @@ public class Skobutik {
     
     Scanner scanner;
     Controller controller;
+    int kundID;
 
     public Skobutik() {
         scanner = new Scanner(System.in);
@@ -15,7 +16,7 @@ public class Skobutik {
     
     public void start() throws SQLException, ClassNotFoundException{
         while(true){
-            System.out.println("Vad vill du göra?\n"
+            System.out.println("\nVad vill du göra?\n"
                     + "\n[1] Visa kundinformation"
                     + "\n[2] Visa Produkter per Kategori"
                     + "\n[3] Lägg beställning"
@@ -23,10 +24,10 @@ public class Skobutik {
 
             switch(scanner.nextLine()){
                 case "1":
-                    visaKundInfo();
+                    visaKundTotal();
                     break;
                 case "2":
-                    visaProdukter();
+                    visaProdukterPerKategori();
                     break;
                 case "3":
                     läggBeställning();
@@ -46,13 +47,8 @@ public class Skobutik {
         }
     }
     
-    public void visaKund(){
-        System.out.println("Ange KundID:");
-        System.out.println(controller.getKundNamn(scanner.nextLine()));
-    }
-    
     public void visaKundTotal(){
-        System.out.println("Ange kundens namn/ID:\n");
+        System.out.println("\nAnge kundens namn/ID:\n");
         controller.getKundlistaMedTotal(scanner.nextLine())
                 .entrySet()
                 .stream()
@@ -61,25 +57,50 @@ public class Skobutik {
         System.out.println();
     }
     
-//    public void visaVilkaSomHarBeställtEnModell(){
-//        System.out.println("Ange modellens namn:");
-//        controller.orderedModell(scanner.nextLine()).forEach(n -> System.out.println(n));
-//    }
-    
-    public void visaKundInfo(){
-        
-    }
-    
-    public void visaProdukter(){
-        
+    public void visaProdukterPerKategori(){
+        controller.getModellerPerKategori()
+                .entrySet()
+                .stream()
+                .forEach((t) -> {
+                    System.out.print("\n" + t.getKey() + ":\t");
+                    t.getValue().forEach((s) -> {
+                        System.out.print(s + ", ");
+                    });
+                });
     }
     
     public void läggBeställning(){
-        
+        String input;
+        System.out.println("\nVälj Modell:\n");
+        controller.getAllaModellNamn()
+                .entrySet()
+                .stream()
+                .forEach(m -> System.out.println("[" + m.getKey() + "] " + m.getValue()));
+        input = scanner.nextLine();
+        System.out.println("\nVälj Storlek:\n");
+        controller.getStorlekarFörModell(input).forEach(s -> System.out.println(s));
+    }
+    
+    public boolean login(){
+        String tempNamn;
+        String tempLösen;
+        System.out.print("\nAnge namn:\t");
+        tempNamn = scanner.nextLine().trim();
+        System.out.print("\nAnge lösenord:\t");
+        tempLösen = scanner.nextLine().trim();
+        kundID = controller.login(tempNamn, tempLösen);
+        if(kundID > 0)
+            return true;
+        return false;
     }
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         Skobutik skobutik = new Skobutik();
-        skobutik.visaKundTotal();
+        while(true){
+            if (skobutik.login())
+                skobutik.start();
+            else
+                System.out.println("\nFelaktigt namn eller lösenord");
+        }
     }
 }
