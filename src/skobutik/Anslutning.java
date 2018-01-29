@@ -59,8 +59,7 @@ public class Anslutning {
             ResultSet rs = stmt.executeQuery();
         ){
             while(rs.next()){
-                Kund tempKund = new Kund(rs.getString("namn"), rs.getString("lösenord"), getSpecificOrt(rs.getInt("ortID")).getNamn());
-                tempKund.setBeställningar(getSpecifikKundsBeställningar(rs.getInt("ID")));
+                Kund tempKund = new Kund(rs.getInt("ID"), rs.getString("namn"), rs.getString("lösenord"), getSpecificOrt(rs.getInt("ortID")).getNamn());
                 getAllaKunder.add(tempKund);
             }
         }   catch (SQLException ex) {
@@ -80,8 +79,7 @@ public class Anslutning {
             stmt.setString(1, (namnId));
             ResultSet rs = stmt.executeQuery();
             if(rs.next()) {
-                tempKund = new Kund(rs.getString("namn"), rs.getString("lösenord"), getSpecificOrt(rs.getInt("ortID")).getNamn());
-                tempKund.setBeställningar(getSpecifikKundsBeställningar(rs.getInt("ID")));
+                tempKund = new Kund(rs.getInt("ID"), rs.getString("namn"), rs.getString("lösenord"), getSpecificOrt(rs.getInt("ortID")).getNamn());
                 return tempKund;
             }
         }   catch (SQLException ex) {
@@ -358,11 +356,7 @@ public class Anslutning {
             ResultSet rs = stmt.executeQuery();
         ){
             while(rs.next()){
-                int tempID = rs.getInt("ID");
-                Beställning tempBeställning = new Beställning("1999", rs.getBoolean("expiderad"));
-                for (Sko sko : getAllaSkorISpecifikBeställning(tempID)) {
-                    tempBeställning.getSkor().add(sko);
-                }
+                Beställning tempBeställning = new Beställning(rs.getInt("ID"), "1999", rs.getBoolean("expiderad"));
                 allaBeställningar.add(tempBeställning);
             }
                 
@@ -382,14 +376,9 @@ public class Anslutning {
             stmt.setString(1, String.valueOf(kundID));
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
-                int tempID = rs.getInt("ID");
-                Beställning tempBeställning = new Beställning("1999", rs.getBoolean("expiderad"));
-                for (Sko sko : getAllaSkorISpecifikBeställning(tempID)) {
-                    tempBeställning.getSkor().add(sko);
-                }
+                Beställning tempBeställning = new Beställning(rs.getInt("ID"), "1999", rs.getBoolean("expiderad"));
                 allaBeställningar.add(tempBeställning);
             }
-                
         }   catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -405,17 +394,21 @@ public class Anslutning {
             stmt.setString(1, String.valueOf(ID));
             ResultSet rs = stmt.executeQuery();
             if(rs.next()){
-                int tempID = rs.getInt("ID");
-                theBeställning = new Beställning("1999", rs.getBoolean("expiderad"));
-                for (Sko sko : getAllaSkorISpecifikBeställning(tempID)) {
-                    theBeställning.getSkor().add(sko);
-                }
+                theBeställning = new Beställning(rs.getInt("ID"), "1999", rs.getBoolean("expiderad"));
                 return theBeställning;
             }
         }   catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
         return new Beställning();
+    }
+    
+    public void addSkorToBeställning(Beställning beställning){
+        beställning.setSkor(getAllaSkorISpecifikBeställning(beställning.getID()));
+    }
+    
+    public void addBeställningarToKund(Kund kund){
+        kund.setBeställningar(getSpecifikKundsBeställningar(kund.getID()));
     }
     
     private boolean isInteger(String s){

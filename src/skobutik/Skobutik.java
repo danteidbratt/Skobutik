@@ -75,6 +75,6 @@ public class Skobutik {
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         Skobutik skobutik = new Skobutik();
-        skobutik.visaVilkaSomHarBeställtEnModell();
+        skobutik.visaKundTotal();
     }
 }

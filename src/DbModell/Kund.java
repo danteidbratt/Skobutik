@@ -4,12 +4,14 @@ import java.util.*;
 
 public class Kund {
 
+    private int ID;
     private String namn;
     private String lösenord;
     private String ort;
     private List<Beställning> beställningar;
 
-    public Kund(String namn, String lösenord, String ort) {
+    public Kund(int ID, String namn, String lösenord, String ort) {
+        this.ID = ID;
         this.namn = namn;
         this.lösenord = lösenord;
         this.ort = ort;
@@ -18,8 +20,15 @@ public class Kund {
 
     public Kund() {
     }
-    
 
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
+    }
+    
     public String getNamn() {
         return namn;
     }
