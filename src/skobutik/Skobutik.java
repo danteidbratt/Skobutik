@@ -53,7 +53,12 @@ public class Skobutik {
     
     public void visaKundTotal(){
         System.out.println("Ange kundens namn/ID:");
-        System.out.println(controller.getKundTotal(scanner.nextLine()));
+        controller.getKundlistaMedTotal(scanner.nextLine())
+                .entrySet()
+                .stream()
+                .forEach(k -> System.out.print("\nNamn: " + k.getKey() + 
+                                             "\tTotal: " + k.getValue() + "\n"));
+        System.out.println();
     }
     
     public void visaVilkaSomHarBeställtEnModell(){

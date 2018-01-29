@@ -7,19 +7,22 @@ public class Controller {
 
     private final Anslutning anslutning = new Anslutning();
     
+    public Map<String, Integer> getKundlistaMedTotal(String namnID){
+        Map<String, Integer> kundlista = new HashMap<>();
+        if(!isEmpty(namnID)){
+            kundlista.put(getKundNamn(namnID), getKundTotal(namnID));
+        }
+        else {
+            for (Kund kund : anslutning.getAllaKunder()) {
+                kundlista.put(kund.getNamn(), getKundTotal(kund.getNamn()));
+            }
+        }
+        return kundlista;
+    }
+    
     public String getKundNamn(String namnID){
         return anslutning.getSpecificKund(namnID).getNamn();
     }
-    
-//    public int getKundTotal(String namnID){
-//        int total = 0;
-//        for (Beställning beställning : anslutning.getSpecificKund(namnID).getBeställningar()) {
-//            for (Sko sko : beställning.getSkor()) {
-//                total += sko.getPris();
-//            }
-//        }
-//        return total;
-//    }
     
     public int getKundTotal(String namnID){
         int total = 0;
