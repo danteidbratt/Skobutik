@@ -52,7 +52,7 @@ public class Skobutik {
     }
     
     public void visaKundTotal(){
-        System.out.println("Ange kundens namn/ID:");
+        System.out.println("Ange kundens namn/ID:\n");
         controller.getKundlistaMedTotal(scanner.nextLine())
                 .entrySet()
                 .stream()
@@ -61,10 +61,10 @@ public class Skobutik {
         System.out.println();
     }
     
-    public void visaVilkaSomHarBeställtEnModell(){
-        System.out.println("Ange modellens namn:");
-        controller.orderedModell(scanner.nextLine()).forEach(n -> System.out.println(n));
-    }
+//    public void visaVilkaSomHarBeställtEnModell(){
+//        System.out.println("Ange modellens namn:");
+//        controller.orderedModell(scanner.nextLine()).forEach(n -> System.out.println(n));
+//    }
     
     public void visaKundInfo(){
         

@@ -4,12 +4,14 @@ import java.util.*;
 
 public class Modell {
     
+    private int modellID;
     private String namn;
     private int pris;
     private String märke;
     private List<String> kategorier;
 
-    public Modell(String namn, int pris, String märke) {
+    public Modell(int modellID, String namn, int pris, String märke) {
+        this.modellID = modellID;
         this.namn = namn;
         this.pris = pris;
         this.märke = märke;
@@ -17,6 +19,14 @@ public class Modell {
     }
     
     public Modell() {
+    }
+
+    public int getModellID() {
+        return modellID;
+    }
+
+    public void setModellID(int modellID) {
+        this.modellID = modellID;
     }
     
     public String getNamn() {

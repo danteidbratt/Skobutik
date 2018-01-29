@@ -2,6 +2,7 @@ package skobutik;
 
 import DbModell.*;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -20,11 +21,14 @@ public class Anslutning {
         }
     }
     
-    public List<String> getAllaOrter(){
+    public List<String> getOrter(String ID){
         List<String> allaOrter = new ArrayList<>();
-        String ortQuery = "select * from ort";
+        String query = "select * from ort";
+        if (ID.length() > 0) {
+            query = "select * from ort where ID = " + ID;
+        }
         try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
-            PreparedStatement stmt = con.prepareStatement(ortQuery);
+            PreparedStatement stmt = con.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
         ){
             while(rs.next()){
@@ -36,61 +40,38 @@ public class Anslutning {
         return allaOrter;
     }
     
-    public Ort getSpecificOrt(int ID){
-        String query = "select * from ort where id = ?";
-        try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
-            PreparedStatement stmt = con.prepareStatement(query);
-        ){
-            stmt.setString(1, String.valueOf(ID));
-            ResultSet rs = stmt.executeQuery();
-            if(rs.next())
-                return new Ort(rs.getString("namn"));
-        }   catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return new Ort();
-    }
-    
-    public List<Kund> getAllaKunder(){
-        List<Kund> getAllaKunder = new ArrayList<>();
+    public List<Kund> getKunder(String namnID){
+        List<Kund> allaKunder = new ArrayList<>();
         String ortQuery = "select * from kund";
+        if(namnID.length() > 0){
+            if(isInteger(namnID))
+                ortQuery = "select * from kund where ID = ?";
+            else 
+                ortQuery = "select * from kund where namn like ?";
+        }
         try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
             PreparedStatement stmt = con.prepareStatement(ortQuery);
-            ResultSet rs = stmt.executeQuery();
         ){
+            if(namnID.length() > 0){
+                stmt.setString(1, namnID);
+            }
+            ResultSet rs = stmt.executeQuery();
             while(rs.next()){
-                Kund tempKund = new Kund(rs.getInt("ID"), rs.getString("namn"), rs.getString("lösenord"), getSpecificOrt(rs.getInt("ortID")).getNamn());
-                getAllaKunder.add(tempKund);
+                Kund tempKund = new Kund(rs.getInt("ID"), rs.getString("namn"), rs.getString("lösenord"), getOrter(String.valueOf(rs.getInt("ortID"))).get(0));
+                allaKunder.add(tempKund);
             }
         }   catch (SQLException ex) {
             ex.printStackTrace();
         }
-        return getAllaKunder;
+        return allaKunder;
     }
         
-    public Kund getSpecificKund(String namnId){
-        String query = "select * from kund where namn like ?";
-        if(isInteger(namnId))
-            query = "select * from kund where ID = ?";
-        Kund tempKund;
-        try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
-            PreparedStatement stmt = con.prepareStatement(query);
-        ){
-            stmt.setString(1, (namnId));
-            ResultSet rs = stmt.executeQuery();
-            if(rs.next()) {
-                tempKund = new Kund(rs.getInt("ID"), rs.getString("namn"), rs.getString("lösenord"), getSpecificOrt(rs.getInt("ortID")).getNamn());
-                return tempKund;
-            }
-        }   catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return new Kund();
-    }
-    
-    public List<String> getAllaMärken(){
+    public List<String> getMärken(String ID){
         List<String> allaMärken = new ArrayList<>();
         String query = "select * from märke";
+        if (ID.length() > 0) {
+            query = "select * from märke where ID = " + ID;
+        }
         try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
             PreparedStatement stmt = con.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
@@ -104,24 +85,12 @@ public class Anslutning {
         return allaMärken;
     }
     
-    public String getSpecificMärke(int ID){
-        String query = "select * from Märke where id = ?";
-        try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
-            PreparedStatement stmt = con.prepareStatement(query);
-        ){
-            stmt.setString(1, String.valueOf(ID));
-            ResultSet rs = stmt.executeQuery();
-            if(rs.next())
-                return rs.getString("namn");
-        }   catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return "";
-    }
-    
-    public List<String> getAllaKategorier(){
+    public List<String> getKategorier(String ID){
         List<String> allaKategorier = new ArrayList<>();
         String query = "select * from kategori";
+        if (ID.length() > 0) {
+            query = "select * from kategori where ID = " + ID;
+        }
         try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
             PreparedStatement stmt = con.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
@@ -135,39 +104,20 @@ public class Anslutning {
         return allaKategorier;
     }
     
-    public String getSpecificKategori(int ID){
-        String query = "select * from kategori where id = ?";
-        try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
-            PreparedStatement stmt = con.prepareStatement(query);
-        ){
-            stmt.setString(1, String.valueOf(ID));
-            ResultSet rs = stmt.executeQuery();
-            if(rs.next())
-                return rs.getString("namn");
-        }   catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return "";
-    }
-    
     public List<String> getAllaKategorierFörSpecifikModell(int modellID){
         List<String> kategorierFörSpecifikModell = new ArrayList<>();
         List<Integer> kategoriIDs = new ArrayList<>();
         String query1 = "select * from skotyp";
-        String query2 = "select * from kategori";
         try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
             PreparedStatement stmt1 = con.prepareStatement(query1);
             ResultSet rs1 = stmt1.executeQuery();
-            PreparedStatement stmt2 = con.prepareStatement(query2);
-            ResultSet rs2 = stmt2.executeQuery();
         ){
             while(rs1.next()){
                 if (rs1.getInt("modellID") == modellID)
                     kategoriIDs.add(rs1.getInt("kategoriID"));
             }
-            while(rs2.next()){
-                if (kategoriIDs.contains(rs2.getInt("ID")))
-                    kategorierFörSpecifikModell.add(rs2.getString("namn"));
+            for (Integer kategoriID : kategoriIDs) {
+                kategorierFörSpecifikModell.add(getKategorier(String.valueOf(kategoriID)).get(0));
             }
         }   catch (SQLException ex) {
             ex.printStackTrace();
@@ -175,9 +125,12 @@ public class Anslutning {
         return kategorierFörSpecifikModell;
     }
     
-    public List<Integer> getAllaStorlekar(){
+    public List<Integer> getStorlekar(String ID){
         List<Integer> allaStorlekar = new ArrayList<>();
         String query = "select * from storlek";
+        if (ID.length() > 0) {
+            query = "select * from storlek where ID = " + ID;
+        }
         try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
             PreparedStatement stmt = con.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
@@ -191,24 +144,12 @@ public class Anslutning {
         return allaStorlekar;
     }
     
-    public int getSpecificStorlek(int ID){
-        String query = "select * from storlek where id = ?";
-        try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
-            PreparedStatement stmt = con.prepareStatement(query);
-        ){
-            stmt.setString(1, String.valueOf(ID));
-            ResultSet rs = stmt.executeQuery();
-            if(rs.next())
-                return rs.getInt("nummer");
-        }   catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return 0;
-    }
-    
-    public List<String> getAllaFärger(){
+    public List<String> getFärger(String ID){
         List<String> allaFärger = new ArrayList<>();
         String query = "select * from färg";
+        if (ID.length() > 0) {
+            query = "select * from färg where ID = " + ID;
+        }
         try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
             PreparedStatement stmt = con.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
@@ -222,35 +163,19 @@ public class Anslutning {
         return allaFärger;
     }
     
-    public String getSpecificFärg(int ID){
-        String query = "select * from färg where id = ?";
-        try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
-            PreparedStatement stmt = con.prepareStatement(query);
-        ){
-            stmt.setString(1, String.valueOf(ID));
-            ResultSet rs = stmt.executeQuery();
-            if(rs.next())
-                return rs.getString("namn");
-        }   catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return "";
-    }
-    
-    public List<Modell> getAllaModeller(){
+    public List<Modell> getModeller(String ID){
         List<Modell> allaModeller = new ArrayList<>();
-        String query1 = "select * from modell";
-        List<Integer[]> coupling = new ArrayList<>();
+        String query = "select * from modell";
+        if(ID.length() > 0){
+            query = "select * from modell where ID = " + ID;
+        }
         try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
-            PreparedStatement stmt1 = con.prepareStatement(query1);
+            PreparedStatement stmt1 = con.prepareStatement(query);
             ResultSet rs = stmt1.executeQuery();
         ){
             while(rs.next()){
-                int tempID = rs.getInt("ID");
-                Modell tempModell = new Modell(rs.getString("namn"),rs.getInt("pris"),getSpecificMärke(rs.getInt("märkeID")));
-                for (String string : getAllaKategorierFörSpecifikModell(tempID)) {
-                    tempModell.getKategorier().add(string);
-                }
+                Modell tempModell = new Modell(rs.getInt("ID"), rs.getString("namn"),rs.getInt("pris"),getMärken(String.valueOf(rs.getInt("märkeID"))).get(0));
+                tempModell.setKategorier(getAllaKategorierFörSpecifikModell(tempModell.getModellID()));
                 allaModeller.add(tempModell);
             }
         }   catch (SQLException ex) {
@@ -259,36 +184,18 @@ public class Anslutning {
         return allaModeller;
     }
     
-    public Modell getSpecificModell(int ID){
-        Modell theModell;
-        String query = "select * from modell where id = ?";
-        try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
-            PreparedStatement stmt = con.prepareStatement(query);
-        ){
-            stmt.setString(1, String.valueOf(ID));
-            ResultSet rs = stmt.executeQuery();
-            if(rs.next()){
-                theModell = new Modell(rs.getString("namn"), rs.getInt("pris"), getSpecificMärke(rs.getInt("märkeID")));
-                for (String string : getAllaKategorierFörSpecifikModell(ID)) {
-                    theModell.getKategorier().add(string);
-                }
-                return theModell;
-            }
-        }   catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return new Modell();
-    }
-    
-    public List<Sko> getAllaSkor(){
+    public List<Sko> getSkor(String ID){
         List<Sko> allaSkor = new ArrayList<>();
         String query = "select * from sko";
+        if(ID.length() > 0){
+            query = "select * from sko where ID = " + ID;
+        }
         try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
             PreparedStatement stmt = con.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
         ){
             while(rs.next()){
-                allaSkor.add(new Sko(getSpecificStorlek(rs.getInt("storlekID")), getSpecificFärg(rs.getInt("färgID")), getSpecificLagerStatus(rs.getInt("ID")), getSpecificModell(rs.getInt("modellID"))));
+                allaSkor.add(new Sko(getStorlekar(String.valueOf(rs.getInt("storlekID"))).get(0), getFärger(String.valueOf(rs.getInt("färgID"))).get(0), getLagerStatus(rs.getInt("ID")), getModeller(String.valueOf(rs.getInt("modellID"))).get(0)));
             }
         }   catch (SQLException ex) {
             ex.printStackTrace();
@@ -296,22 +203,7 @@ public class Anslutning {
         return allaSkor;
     }
     
-    public Sko getSpecificSko(int ID){
-        String query = "select * from sko where id = ?";
-        try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
-            PreparedStatement stmt = con.prepareStatement(query);
-        ){
-            stmt.setString(1, String.valueOf(ID));
-            ResultSet rs = stmt.executeQuery();
-            if(rs.next())
-                return new Sko(getSpecificStorlek(rs.getInt("storlekID")), getSpecificFärg(rs.getInt("färgID")), getSpecificLagerStatus(rs.getInt("ID")), getSpecificModell(rs.getInt("modellID")));
-        }   catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return new Sko();
-    }
-    
-    public int getSpecificLagerStatus(int skoID){
+    public int getLagerStatus(int skoID){
         String query = "select * from lagerstatus where skoID = ?";
         try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
             PreparedStatement stmt = con.prepareStatement(query);
@@ -326,7 +218,7 @@ public class Anslutning {
         return 0;
     }
     
-    public List<Sko> getAllaSkorISpecifikBeställning(int beställningID){
+    public List<Sko> getAllaSkorIBeställning(int beställningID){
         List<Sko> allaSkorISpecifikBeställning = new ArrayList<>();
         List<Integer> skoIds = new ArrayList<>();
         String query1 = "select * from köp where beställningID = ?";
@@ -339,7 +231,7 @@ public class Anslutning {
                 skoIds.add(rs1.getInt("skoID"));
             }
             for (Integer skoId : skoIds) {
-                allaSkorISpecifikBeställning.add(getSpecificSko(skoId));
+                allaSkorISpecifikBeställning.add(getSkor(String.valueOf(skoId)).get(0));
             }
         }   catch (SQLException ex) {
             ex.printStackTrace();
@@ -347,16 +239,19 @@ public class Anslutning {
         return allaSkorISpecifikBeställning;
     }
     
-    public List<Beställning> getAllaBeställningar(){
+    public List<Beställning> getBeställningar(String ID){
         List<Beställning> allaBeställningar = new ArrayList<>();
         String kundQuery = "select * from beställning";
+        if (ID.length() > 0){
+            kundQuery = "select * from beställning where ID = " + ID;
+        }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
             PreparedStatement stmt = con.prepareStatement(kundQuery);
             ResultSet rs = stmt.executeQuery();
         ){
             while(rs.next()){
-                Beställning tempBeställning = new Beställning(rs.getInt("ID"), "1999", rs.getBoolean("expiderad"));
+                Beställning tempBeställning = new Beställning(rs.getInt("ID"), LocalDateTime.parse(rs.getString("datum").substring(0, 19)), rs.getBoolean("expiderad"));
                 allaBeställningar.add(tempBeställning);
             }
                 
@@ -366,7 +261,7 @@ public class Anslutning {
         return allaBeställningar;
     }
     
-    public List<Beställning> getSpecifikKundsBeställningar(int kundID){
+    public List<Beställning> getBeställningarIKund(int kundID){
         List<Beställning> allaBeställningar = new ArrayList<>();
         String kundQuery = "select * from beställning where kundID = ?";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -376,39 +271,13 @@ public class Anslutning {
             stmt.setString(1, String.valueOf(kundID));
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
-                Beställning tempBeställning = new Beställning(rs.getInt("ID"), "1999", rs.getBoolean("expiderad"));
+                Beställning tempBeställning = new Beställning(rs.getInt("ID"), LocalDateTime.parse(rs.getString("datum").substring(0, 19), formatter), rs.getBoolean("expiderad"));
                 allaBeställningar.add(tempBeställning);
             }
         }   catch (SQLException ex) {
             ex.printStackTrace();
         }
         return allaBeställningar;
-    }
-    
-    public Beställning getSpecificBeställning(int ID){
-        Beställning theBeställning;
-        String query = "select * from beställning where id = ?";
-        try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
-            PreparedStatement stmt = con.prepareStatement(query);
-        ){
-            stmt.setString(1, String.valueOf(ID));
-            ResultSet rs = stmt.executeQuery();
-            if(rs.next()){
-                theBeställning = new Beställning(rs.getInt("ID"), "1999", rs.getBoolean("expiderad"));
-                return theBeställning;
-            }
-        }   catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-        }
-        return new Beställning();
-    }
-    
-    public void addSkorToBeställning(Beställning beställning){
-        beställning.setSkor(getAllaSkorISpecifikBeställning(beställning.getID()));
-    }
-    
-    public void addBeställningarToKund(Kund kund){
-        kund.setBeställningar(getSpecifikKundsBeställningar(kund.getID()));
     }
     
     private boolean isInteger(String s){

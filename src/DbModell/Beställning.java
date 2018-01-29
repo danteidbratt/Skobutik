@@ -6,11 +6,11 @@ import java.util.*;
 public class Beställning {
 
     private int ID;
-    private String datum;
+    private LocalDateTime datum;
     private boolean expiderad;
     private List<Sko> skor;
 
-    public Beställning(int ID, String datum, boolean expiderad) {
+    public Beställning(int ID, LocalDateTime datum, boolean expiderad) {
         this.ID = ID;
         this.datum = datum;
         this.expiderad = expiderad;
@@ -28,14 +28,14 @@ public class Beställning {
         this.ID = ID;
     }
 
-    public String getDatum() {
+    public LocalDateTime getDatum() {
         return datum;
     }
 
-    public void setDatum(String datum) {
+    public void setDatum(LocalDateTime datum) {
         this.datum = datum;
     }
-    
+
     public boolean isExpiderad() {
         return expiderad;
     }
