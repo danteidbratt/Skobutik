@@ -14,12 +14,16 @@ public class Skobutik {
     String kundID;
     List<ViewSko> skor;
     List<ViewBeställning> beställningar;
+    Map<Integer,String> alternatives;
+    List<String> stuff;
+    int input;
 
     public Skobutik() {
         scanner = new Scanner(System.in);
         controller = new Controller();
         skor = new ArrayList<>();
         beställningar = new ArrayList<>();
+        input = 0;
     }
     
     public void start() throws SQLException, ClassNotFoundException{
@@ -28,6 +32,7 @@ public class Skobutik {
                     + "\n[1] Visa kundinformation"
                     + "\n[2] Visa Produkter per Kategori"
                     + "\n[3] Lägg beställning"
+                    + "\n[4] Logga ut"
                     + "\n[0] Avsluta\n");
 
             switch(scanner.nextLine()){
@@ -40,6 +45,9 @@ public class Skobutik {
                 case "3":
                     läggBeställning();
                     break;
+                case "4":
+                    System.out.println("\n----------------****************----------------");
+                    return;
                 case "0":
                     System.exit(0);
                     break;
@@ -75,74 +83,50 @@ public class Skobutik {
     }
     
     public void läggBeställning(){
-        int input;
         String inputNamn;
         String inputStorlek;
         String inputFärg;
         String inputSkoID;
         String inputBeställningID = null;
+        String price;
         
-        Map<Integer,String> alternatives;
-        List<String> stuff;
         skor = controller.getAllaSkor();
-        skor = skor.stream().filter(s -> s.getAntal() > 0).collect(Collectors.toList());
-        stuff = skor.stream()
-                .map(ViewSko::getNamn)
-                .collect(Collectors.toSet())
-                .stream()
-                .collect(Collectors.toList());
+        filterByStock();
         System.out.println("\nVälj Modell:\n");
         alternatives = generateMapFromList(stuff);
         printAlternatives(alternatives);
         System.out.println();
-        if ((input = Integer.parseInt(scanner.nextLine())) > alternatives.size()){
-            System.out.println("\nOgiltig inmatning");
+        if(!isValidInput(scanner.nextLine()))
             return;
-        }
+        
         inputNamn = alternatives.get(input);
-        skor = skor.stream()
-                .filter(s -> s.getNamn().equalsIgnoreCase(inputNamn))
-                .collect(Collectors.toList());
-        stuff = skor.stream()
-                .map(t -> String.valueOf(t.getStorlek()))
-                .collect(Collectors.toSet())
-                .stream()
-                .collect(Collectors.toList());
+        filterByName(inputNamn);
         Collections.sort(stuff);
-        alternatives = generateMapFromList(stuff);
         System.out.println("\nVälj Storlek:\n");
+        alternatives = generateMapFromList(stuff);
         printAlternatives(alternatives);
         System.out.println();
-        if ((input = Integer.parseInt(scanner.nextLine())) > alternatives.size()){
-            System.out.println("\nOgiltig inmatning");
+        if(!isValidInput(scanner.nextLine()))
             return;
-        }
+        
         inputStorlek = alternatives.get(input);
-        skor = skor.stream()
-                .filter(s -> s.getStorlek() == Integer.parseInt(inputStorlek))
-                .collect(Collectors.toList());
-        stuff = skor.stream()
-                .map(ViewSko::getFärg)
-                .collect(Collectors.toSet())
-                .stream()
-                .collect(Collectors.toList());
+        filterBySize(inputStorlek);
         System.out.println("\nVälj Färg:\n");
         alternatives = generateMapFromList(stuff);
         printAlternatives(alternatives);
         System.out.println();
-        if ((input = Integer.parseInt(scanner.nextLine())) > alternatives.size()){
-            System.out.println("\nOgiltig inmatning");
+        if(!isValidInput(scanner.nextLine()))
             return;
-        }
+        
         inputFärg = alternatives.get(input);
-        skor = skor.stream()
-                .filter(s -> s.getFärg().equals(inputFärg))
-                .collect(Collectors.toList());
+        filterByColor(inputFärg);
         inputSkoID = String.valueOf(skor.get(0).getSkoID());
+        price = String.valueOf(skor.get(0).getPris());
         System.out.println("\nDitt val:\n" +
                            "\nModel:  \t" + inputNamn +
                            "\nStorlek:\t" + inputStorlek +
                            "\nFärg:   \t" + inputFärg +
+                           "\nPris:   \t" + price + ":-" +
                            "\n\n[1] Bekräfta" +
                            "\n[2] Avbryt\n");
         if(scanner.nextLine().trim().equals("1")) {
@@ -155,9 +139,10 @@ public class Skobutik {
             alternatives = generateMapFromList(stuff);
             printAlternatives(alternatives);
             System.out.println("[" + (beställningar.size()+1) + "] Ny Beställning\n");
-            int lalala = Integer.parseInt(scanner.nextLine());
+            if(!isValidInput(scanner.nextLine()))
+                return;
             for (ViewBeställning b : beställningar) {
-                if ((lalala < alternatives.size()+1) && b.getDatum().compareTo(LocalDateTime.parse(alternatives.get(lalala), formatter)) == 0){
+                if (b.getDatum().compareTo(LocalDateTime.parse(alternatives.get(input), formatter)) == 0){
                     inputBeställningID = String.valueOf(b.getID());
                     break;
                 }
@@ -166,19 +151,56 @@ public class Skobutik {
         }
     }
     
-    public boolean login(){
-        String tempNamn;
-        String tempLösen;
-        System.out.print("- Logga in -\n\nAnge namn:\t");
-        tempNamn = scanner.nextLine().trim();
-        System.out.print("\nAnge lösenord:\t");
-        tempLösen = scanner.nextLine().trim();
-        kundID = String.valueOf(controller.login(tempNamn, tempLösen));
-        if(Integer.parseInt(kundID) > 0) {
-            System.out.println("\n----------------****************----------------");
-            return true;
+    private void filterByStock(){
+        skor = skor.stream().filter(s -> s.getAntal() > 0).collect(Collectors.toList());
+        stuff = skor.stream()
+                .map(ViewSko::getNamn)
+                .collect(Collectors.toSet())
+                .stream()
+                .collect(Collectors.toList());
+    }
+    
+    private void filterByName(String input){
+        skor = skor.stream()
+                .filter(s -> s.getNamn().equalsIgnoreCase(input))
+                .collect(Collectors.toList());
+        stuff = skor.stream()
+                .map(t -> String.valueOf(t.getStorlek()))
+                .collect(Collectors.toSet())
+                .stream()
+                .collect(Collectors.toList());
+    }
+    
+    private void filterBySize(String input){
+        skor = skor.stream()
+                .filter(s -> s.getStorlek() == Integer.parseInt(input))
+                .collect(Collectors.toList());
+        stuff = skor.stream()
+                .map(ViewSko::getFärg)
+                .collect(Collectors.toSet())
+                .stream()
+                .collect(Collectors.toList());
+    }
+    
+    private void filterByColor(String input){
+        skor = skor.stream()
+                .filter(s -> s.getFärg().equals(input))
+                .collect(Collectors.toList());
+    }
+    
+    private boolean isValidInput(String input){
+        try{
+            Integer.parseInt(input);
+        } catch (NumberFormatException ex) {
+            System.out.println("\nOgiltig inmatning");
+            return false;
         }
-        return false;
+        if(Integer.parseInt(input) > alternatives.size()){
+            System.out.println("\nOgiltig inmatning");
+            return false;
+        }
+        this.input = Integer.parseInt(input);
+        return true;
     }
     
     public void printAlternatives(Map<Integer,String> alternatives){
@@ -196,13 +218,29 @@ public class Skobutik {
         return theMap;
     }
     
+    public boolean login(){
+        String tempNamn;
+        String tempLösen;
+        System.out.print("\n- Logga in -\n\nAnge namn:\t");
+        tempNamn = scanner.nextLine().trim();
+        System.out.print("\nAnge lösenord:\t");
+        tempLösen = scanner.nextLine().trim();
+        kundID = String.valueOf(controller.login(tempNamn, tempLösen));
+        if(Integer.parseInt(kundID) > 0) {
+            System.out.println("\n----------------****************----------------");
+            return true;
+        }
+        return false;
+    }
+    
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         Skobutik skobutik = new Skobutik();
+        System.out.println("--- Dantes OfflineSkor ---");
         while(true){
             if (skobutik.login())
                 skobutik.start();
             else
-                System.out.println("\nFelaktigt namn eller lösenord\n");
+                System.out.println("\nFelaktigt namn eller lösenord");
         }
     }
 }
