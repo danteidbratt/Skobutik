@@ -4,12 +4,12 @@ public class Storlek {
     
     private int nummer;
 
-    public int getStorlek() {
+    public int getNummer() {
         return nummer;
     }
 
-    public void setStorlek(int nummer) {
+    public void setNummer(int nummer) {
         this.nummer = nummer;
     }
-    
+
 }

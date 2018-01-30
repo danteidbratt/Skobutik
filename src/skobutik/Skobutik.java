@@ -44,7 +44,7 @@ public class Skobutik {
                     System.exit(0);
                     break;
                 default:
-                    System.out.println("Ogiltig inmatning");
+                    System.out.println("\nOgiltig inmatning");
                     break;
             }
             try {
@@ -75,13 +75,14 @@ public class Skobutik {
     }
     
     public void läggBeställning(){
+        int input;
         String inputNamn;
         String inputStorlek;
         String inputFärg;
         String inputSkoID;
         String inputBeställningID = null;
         
-        Map<Integer,String> alternatives = new HashMap<>();
+        Map<Integer,String> alternatives;
         List<String> stuff;
         skor = controller.getAllaSkor();
         skor = skor.stream().filter(s -> s.getAntal() > 0).collect(Collectors.toList());
@@ -94,7 +95,11 @@ public class Skobutik {
         alternatives = generateMapFromList(stuff);
         printAlternatives(alternatives);
         System.out.println();
-        inputNamn = alternatives.get(Integer.parseInt(scanner.nextLine()));
+        if ((input = Integer.parseInt(scanner.nextLine())) > alternatives.size()){
+            System.out.println("\nOgiltig inmatning");
+            return;
+        }
+        inputNamn = alternatives.get(input);
         skor = skor.stream()
                 .filter(s -> s.getNamn().equalsIgnoreCase(inputNamn))
                 .collect(Collectors.toList());
@@ -108,7 +113,11 @@ public class Skobutik {
         System.out.println("\nVälj Storlek:\n");
         printAlternatives(alternatives);
         System.out.println();
-        inputStorlek = alternatives.get(Integer.parseInt(scanner.nextLine()));
+        if ((input = Integer.parseInt(scanner.nextLine())) > alternatives.size()){
+            System.out.println("\nOgiltig inmatning");
+            return;
+        }
+        inputStorlek = alternatives.get(input);
         skor = skor.stream()
                 .filter(s -> s.getStorlek() == Integer.parseInt(inputStorlek))
                 .collect(Collectors.toList());
@@ -121,7 +130,11 @@ public class Skobutik {
         alternatives = generateMapFromList(stuff);
         printAlternatives(alternatives);
         System.out.println();
-        inputFärg = alternatives.get(Integer.parseInt(scanner.nextLine()));
+        if ((input = Integer.parseInt(scanner.nextLine())) > alternatives.size()){
+            System.out.println("\nOgiltig inmatning");
+            return;
+        }
+        inputFärg = alternatives.get(input);
         skor = skor.stream()
                 .filter(s -> s.getFärg().equals(inputFärg))
                 .collect(Collectors.toList());
@@ -190,7 +203,7 @@ public class Skobutik {
             if (skobutik.login())
                 skobutik.start();
             else
-                System.out.println("\nFelaktigt namn eller lösenord");
+                System.out.println("\nFelaktigt namn eller lösenord\n");
         }
     }
 }

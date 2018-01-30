@@ -137,8 +137,8 @@ public class Anslutning {
         return kategorierFörSpecifikModell;
     }
     
-    public List<Integer> getStorlekar(String ID){
-        List<Integer> allaStorlekar = new ArrayList<>();
+    public List<Storlek> getStorlekar(String ID){
+        List<Storlek> allaStorlekar = new ArrayList<>();
         String query = "select * from storlek";
         if (ID.length() > 0) {
             query = "select * from storlek where ID = ?";
@@ -150,7 +150,9 @@ public class Anslutning {
                 stmt.setString(1, ID);
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
-                allaStorlekar.add(rs.getInt("nummer"));
+                Storlek temp = new Storlek();
+                temp.setNummer(rs.getInt("nummer"));
+                allaStorlekar.add(temp);
             }
         }   catch (SQLException ex) {
             ex.printStackTrace();
@@ -158,8 +160,8 @@ public class Anslutning {
         return allaStorlekar;
     }
     
-    public List<String> getFärger(String ID){
-        List<String> allaFärger = new ArrayList<>();
+    public List<Färg> getFärger(String ID){
+        List<Färg> allaFärger = new ArrayList<>();
         String query = "select * from färg";
         if (ID.length() > 0)
             query = "select * from färg where ID = ?";
@@ -170,7 +172,9 @@ public class Anslutning {
                 stmt.setString(1, ID);
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
-                allaFärger.add(rs.getString("namn"));
+                Färg temp = new Färg();
+                temp.setNamn(rs.getString("namn"));
+                allaFärger.add(temp);
             }
         }   catch (SQLException ex) {
             ex.printStackTrace();
@@ -219,7 +223,7 @@ public class Anslutning {
             while(rs.next()){
                 Sko temp = new Sko();
                 Modell m = getModeller(String.valueOf(rs.getInt("modellID"))).get(0);
-                temp.setID(rs.getInt("ID"));
+                temp.setSkoID(rs.getInt("ID"));
                 temp.setStorlek(getStorlekar(String.valueOf(rs.getInt("storlekID"))).get(0));
                 temp.setFärg(getFärger(String.valueOf(rs.getInt("färgID"))).get(0));
                 temp.setAntal(getLagerStatus(rs.getInt("ID")));
@@ -247,8 +251,8 @@ public class Anslutning {
             while(rs.next()){
                 Sko temp = new Sko();
                 Modell m = getModeller(String.valueOf(rs.getInt("modellID"))).get(0);
-                temp.setID(rs.getInt("ID"));
-                temp.setStorlek(rs.getInt(getStorlekar(String.valueOf(rs.getInt("storlekID"))).get(0)));
+                temp.setSkoID(rs.getInt("ID"));
+                temp.setStorlek(getStorlekar(String.valueOf(temp.getSkoID())).get(0));
                 temp.setFärg(getFärger(String.valueOf(rs.getInt("färgID"))).get(0));
                 temp.setAntal(getLagerStatus(rs.getInt("ID")));
                 temp.setNamn(m.getNamn());

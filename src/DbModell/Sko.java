@@ -3,34 +3,34 @@ package DbModell;
 public class Sko extends Modell{
     
     private int skoID;
-    private int storlek;
-    private String färg;
+    private Storlek storlek;
+    private Färg färg;
     private int antal;
 
-    public int getID() {
+    public int getSkoID() {
         return skoID;
     }
 
-    public void setID(int ID) {
-        this.skoID = ID;
+    public void setSkoID(int skoID) {
+        this.skoID = skoID;
     }
-    
-    public int getStorlek() {
+
+    public Storlek getStorlek() {
         return storlek;
     }
 
-    public void setStorlek(int storlek) {
+    public void setStorlek(Storlek storlek) {
         this.storlek = storlek;
     }
 
-    public String getFärg() {
+    public Färg getFärg() {
         return färg;
     }
 
-    public void setFärg(String färg) {
+    public void setFärg(Färg färg) {
         this.färg = färg;
     }
-
+    
     public int getAntal() {
         return antal;
     }

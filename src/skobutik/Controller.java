@@ -44,14 +44,14 @@ public class Controller {
         for (Sko s : anslutning.getSkor("")) {
             ViewSko temp = new ViewSko();
             temp.setAntal(s.getAntal());
-            temp.setFärg(s.getFärg());
+            temp.setFärg(s.getFärg().getNamn());
             temp.setKategorier(s.getKategorier());
             temp.setModellID(s.getModellID());
             temp.setMärke(s.getMärke());
             temp.setNamn(s.getNamn());
             temp.setPris(s.getPris());
-            temp.setSkoID(s.getID());
-            temp.setStorlek(s.getStorlek());
+            temp.setSkoID(s.getSkoID());
+            temp.setStorlek(s.getStorlek().getNummer());
             allaSkor.add(temp);
         }
         return allaSkor;
@@ -62,11 +62,11 @@ public class Controller {
     }
     
     public Set<Integer> getStorlekarFörModell(String modellID){
-        return anslutning.getSkorAvSpecifikModell(modellID).stream().map(t -> t.getStorlek()).collect(Collectors.toSet());
+        return anslutning.getSkorAvSpecifikModell(modellID).stream().map(t -> t.getStorlek().getNummer()).collect(Collectors.toSet());
     }
     
     public int login(String namn, String lösenord){
-        if(anslutning.getKunder(namn).get(0).getLösenord().equalsIgnoreCase(lösenord))
+        if(anslutning.getKunder(namn).size() > 0 && anslutning.getKunder(namn).get(0).getLösenord().equalsIgnoreCase(lösenord))
             return anslutning.getKunder(namn).get(0).getID();
         return 0;
     }
