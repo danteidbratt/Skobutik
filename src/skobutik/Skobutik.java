@@ -162,10 +162,7 @@ public class Skobutik {
                     break;
                 }
             }
-            if(controller.placeOrder(inputSkoID, inputBeställningID, kundID) == 0)
-                System.out.println("\nTack för din beställning");
-            else
-                System.out.println("\nVänligen försök igen");
+            System.out.println("\n" + controller.placeOrder(inputSkoID, inputBeställningID, kundID));
         }
     }
     
@@ -185,7 +182,9 @@ public class Skobutik {
     }
     
     public void printAlternatives(Map<Integer,String> alternatives){
-        alternatives.entrySet().stream().forEach(m -> System.out.println("[" + m.getKey() + "] " + m.getValue()));
+        alternatives.entrySet()
+                .stream()
+                .forEach(m -> System.out.println("[" + m.getKey() + "] " + m.getValue()));
     }
     
     public Map<Integer,String> generateMapFromList(List stuff){

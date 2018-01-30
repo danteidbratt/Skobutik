@@ -351,20 +351,22 @@ public class Anslutning {
         return allaBeställningar;
     }
     
-    public int addToCart(String skoID, String beställningID, String kundID){
+    public String addToCart(String skoID, String beställningID, String kundID){
         String query = "call AddToCart(?,?,?)";
-        int count = 0;
         try(Connection con = DriverManager.getConnection(logInfo.code, logInfo.name, logInfo.pass);
             CallableStatement stmt = con.prepareCall(query)
         ){
             stmt.setString(1, skoID);
             stmt.setString(2, beställningID);
             stmt.setString(3, kundID);
-            stmt.execute();
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                return rs.getString("message");
+            }
         }   catch (SQLException ex) {
             ex.printStackTrace();
         }
-        return count;
+        return "";
     }
     
     private boolean isInteger(String s){

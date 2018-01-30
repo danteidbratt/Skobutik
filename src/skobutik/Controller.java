@@ -84,7 +84,7 @@ public class Controller {
         return beställningarIKund;
     }
     
-    public int placeOrder(String skoID, String beställningID, String kundID){
+    public String placeOrder(String skoID, String beställningID, String kundID){
         return anslutning.addToCart(skoID, beställningID, kundID);
     }
 }
