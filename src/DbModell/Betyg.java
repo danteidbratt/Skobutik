@@ -2,18 +2,16 @@ package DbModell;
 
 public class Betyg {
     
-    private final int id;
+    private int id;
     private String Omdöme;
     private int poäng;
 
-    public Betyg(int id, String Omdöme, int poäng) {
-        this.id = id;
-        this.Omdöme = Omdöme;
-        this.poäng = poäng;
-    }
-
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
     
     public String getOmdöme() {

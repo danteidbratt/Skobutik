@@ -1,5 +1,7 @@
 package skobutik;
 
+import DbModell.*;
+import ViewModels.ViewBeställning;
 import ViewModels.ViewSko;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,7 +18,7 @@ public class Controller {
     
     private int getKundTotal(String namnID){
         List<Integer> total = new ArrayList<>();
-        anslutning.getBeställningarIKund(anslutning.getKunder(namnID).get(0).getID()).forEach((b) -> {
+        anslutning.getBeställningarIKund(String.valueOf(anslutning.getKunder(namnID).get(0).getID())).forEach((b) -> {
             anslutning.getAllaSkorIBeställning(b.getID()).forEach((s) -> {
                 total.add(s.getPris());
             });
@@ -26,13 +28,12 @@ public class Controller {
     
     public Map<String, List<String>> getModellerPerKategori(){
         Map<String, List<String>> modellerPerKategori = new HashMap<>();
-        anslutning.getKategorier("").forEach((k) -> {
-            modellerPerKategori.put(k, new ArrayList<>());
-            anslutning.getModeller("").forEach((m) -> {
-                m.getKategorier().forEach((mk) -> {
-                    if(k.equals(mk))
-                        modellerPerKategori.get(k).add(m.getNamn());
-                });
+        anslutning.getKategorier("").forEach((t) -> {
+            modellerPerKategori.put(t.getNamn(), new ArrayList<>());
+        });
+        anslutning.getModeller("").forEach((t) -> {
+            t.getKategorier().forEach((s) -> {
+                modellerPerKategori.get(s.getNamn()).add(t.getNamn());
             });
         });
         return modellerPerKategori;
@@ -40,7 +41,19 @@ public class Controller {
     
     public List<ViewSko> getAllaSkor(){
         List<ViewSko> allaSkor = new ArrayList<>();
-        anslutning.getSkor("").forEach(s -> allaSkor.add(new ViewSko(s.getID(), s.getStorlek(), s.getFärg(), s.getAntal(),s.getModellID(), s.getNamn(), s.getPris(), s.getMärke(), s.getKategorier())));
+        for (Sko s : anslutning.getSkor("")) {
+            ViewSko temp = new ViewSko();
+            temp.setAntal(s.getAntal());
+            temp.setFärg(s.getFärg());
+            temp.setKategorier(s.getKategorier());
+            temp.setModellID(s.getModellID());
+            temp.setMärke(s.getMärke());
+            temp.setNamn(s.getNamn());
+            temp.setPris(s.getPris());
+            temp.setSkoID(s.getID());
+            temp.setStorlek(s.getStorlek());
+            allaSkor.add(temp);
+        }
         return allaSkor;
     }
             
@@ -56,5 +69,22 @@ public class Controller {
         if(anslutning.getKunder(namn).get(0).getLösenord().equalsIgnoreCase(lösenord))
             return anslutning.getKunder(namn).get(0).getID();
         return 0;
+    }
+    
+    public List<ViewBeställning> getBeställningarIKund(String kundID){
+        List<ViewBeställning> beställningarIKund = new ArrayList<>();
+        for (Beställning beställning : anslutning.getBeställningarIKund(kundID)) {
+            if(!beställning.isExpiderad()){
+                ViewBeställning temp = new ViewBeställning();
+                temp.setID(beställning.getID());
+                temp.setDatum(beställning.getDatum());
+                beställningarIKund.add(temp);
+            }
+        }
+        return beställningarIKund;
+    }
+    
+    public int placeOrder(String skoID, String beställningID, String kundID){
+        return anslutning.addToCart(skoID, beställningID, kundID);
     }
 }

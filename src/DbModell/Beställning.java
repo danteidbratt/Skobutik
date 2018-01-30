@@ -10,13 +10,6 @@ public class Beställning {
     private boolean expiderad;
     private List<Sko> skor;
 
-    public Beställning(int ID, LocalDateTime datum, boolean expiderad) {
-        this.ID = ID;
-        this.datum = datum;
-        this.expiderad = expiderad;
-        this.skor = new ArrayList<>();
-    }
-
     public Beställning() {
     }
 

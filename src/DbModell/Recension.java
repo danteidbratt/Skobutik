@@ -4,26 +4,21 @@ import java.time.LocalDateTime;
 
 public class Recension {
 
-    private final int id;
+    private int id;
     private String kommentar;
     private Betyg betyg;
     private LocalDateTime datum;
     private Kund kund;
     private Modell modell;
 
-    public Recension(int id, String kommentar, Betyg betyg, LocalDateTime datum, Kund kund, Modell modell) {
-        this.id = id;
-        this.kommentar = kommentar;
-        this.betyg = betyg;
-        this.datum = datum;
-        this.kund = kund;
-        this.modell = modell;
-    }
-
     public int getId() {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+    
     public String getKommentar() {
         return kommentar;
     }

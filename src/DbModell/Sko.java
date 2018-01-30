@@ -7,17 +7,6 @@ public class Sko extends Modell{
     private String färg;
     private int antal;
 
-    public Sko(int ID, int storlek, String färg, int antal, Modell modell) {
-        super(modell.getModellID(), modell.getNamn(), modell.getPris(), modell.getMärke());
-        this.skoID = ID;
-        this.storlek = storlek;
-        this.färg = färg;
-        this.antal = antal;
-    }
-
-    public Sko() {
-    }
-
     public int getID() {
         return skoID;
     }
@@ -49,6 +38,5 @@ public class Sko extends Modell{
     public void setAntal(int antal) {
         this.antal = antal;
     }
-    
     
 }

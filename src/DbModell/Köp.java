@@ -5,11 +5,6 @@ public class Köp {
     private int skoID;
     private int beställningID;
 
-    public Köp(int skoID, int beställningID) {
-        this.skoID = skoID;
-        this.beställningID = beställningID;
-    }
-
     public int getSkoID() {
         return skoID;
     }

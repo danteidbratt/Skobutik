@@ -7,19 +7,8 @@ public class Kund {
     private int ID;
     private String namn;
     private String lösenord;
-    private String ort;
+    private Ort ort;
     private List<Beställning> beställningar;
-
-    public Kund(int ID, String namn, String lösenord, String ort) {
-        this.ID = ID;
-        this.namn = namn;
-        this.lösenord = lösenord;
-        this.ort = ort;
-        this.beställningar = new ArrayList<>();
-    }
-
-    public Kund() {
-    }
 
     public int getID() {
         return ID;
@@ -45,11 +34,11 @@ public class Kund {
         this.lösenord = lösenord;
     }
 
-    public String getOrt() {
+    public Ort getOrt() {
         return ort;
     }
 
-    public void setOrt(String ort) {
+    public void setOrt(Ort ort) {
         this.ort = ort;
     }
 

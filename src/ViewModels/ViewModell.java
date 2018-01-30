@@ -1,5 +1,7 @@
 package ViewModels;
 
+import DbModell.Kategori;
+import DbModell.Märke;
 import java.util.*;
 
 public class ViewModell {
@@ -7,19 +9,8 @@ public class ViewModell {
     private int modellID;
     private String namn;
     private int pris;
-    private String märke;
-    private List<String> kategorier;
-
-    public ViewModell(int modellID, String namn, int pris, String märke) {
-        this.modellID = modellID;
-        this.namn = namn;
-        this.pris = pris;
-        this.märke = märke;
-        this.kategorier = new ArrayList<>();
-    }
-    
-    public ViewModell() {
-    }
+    private Märke märke;
+    private List<Kategori> kategorier;
 
     public int getModellID() {
         return modellID;
@@ -28,7 +19,7 @@ public class ViewModell {
     public void setModellID(int modellID) {
         this.modellID = modellID;
     }
-    
+
     public String getNamn() {
         return namn;
     }
@@ -45,19 +36,19 @@ public class ViewModell {
         this.pris = pris;
     }
 
-    public String getMärke() {
+    public Märke getMärke() {
         return märke;
     }
 
-    public void setMärke(String märke) {
+    public void setMärke(Märke märke) {
         this.märke = märke;
     }
 
-    public List<String> getKategorier() {
+    public List<Kategori> getKategorier() {
         return kategorier;
     }
 
-    public void setKategorier(List<String> kategorier) {
+    public void setKategorier(List<Kategori> kategorier) {
         this.kategorier = kategorier;
     }
 

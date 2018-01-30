@@ -1,29 +1,27 @@
 package DbModell;
 
 import java.time.LocalDateTime;
+import java.util.*;
 
 public class Slutilager {
     
-    private final int id;
-    private final Sko sko;
-    private final LocalDateTime datum;
+    private Sko sko;
+    private List<LocalDateTime> datum;
 
-    public Slutilager(int id, Sko sko, LocalDateTime datum) {
-        this.id = id;
-        this.sko = sko;
-        this.datum = datum;
-    }
-
-    public int getId() {
-        return id;
-    }
-    
     public Sko getSko() {
         return sko;
     }
 
-    public LocalDateTime getDatum() {
+    public void setSko(Sko sko) {
+        this.sko = sko;
+    }
+
+    public List<LocalDateTime> getDatum() {
         return datum;
+    }
+
+    public void setDatum(List<LocalDateTime> datum) {
+        this.datum = datum;
     }
 
 }
