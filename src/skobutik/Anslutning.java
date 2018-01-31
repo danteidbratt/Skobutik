@@ -72,8 +72,8 @@ public class Anslutning {
         return allaKunder;
     }
         
-    public List<Märke> getMärken(String ID){
-        List<Märke> allaMärken = new ArrayList<>();
+    public Map<Integer, Märke> getMärken(String ID){
+        Map<Integer, Märke> allaMärken = new HashMap<>();
         String query = "select * from märke";
         if (ID.length() > 0) 
             query = "select * from märke where ID = ?";
@@ -86,7 +86,7 @@ public class Anslutning {
             while(rs.next()){
                 Märke temp = new Märke();
                 temp.setNamn(rs.getString("namn"));
-                allaMärken.add(temp);
+                allaMärken.put(rs.getInt("ID") ,temp);
             }
         }   catch (SQLException ex) {
             ex.printStackTrace();
@@ -137,8 +137,8 @@ public class Anslutning {
         return kategorierFörSpecifikModell;
     }
     
-    public List<Storlek> getStorlekar(String ID){
-        List<Storlek> allaStorlekar = new ArrayList<>();
+    public Map<Integer, Storlek> getStorlekar(String ID){
+        Map<Integer, Storlek> allaStorlekar = new HashMap<>();
         String query = "select * from storlek";
         if (ID.length() > 0) {
             query = "select * from storlek where ID = ?";
@@ -152,7 +152,7 @@ public class Anslutning {
             while(rs.next()){
                 Storlek temp = new Storlek();
                 temp.setNummer(rs.getInt("nummer"));
-                allaStorlekar.add(temp);
+                allaStorlekar.put(rs.getInt("ID"), temp);
             }
         }   catch (SQLException ex) {
             ex.printStackTrace();
@@ -160,8 +160,8 @@ public class Anslutning {
         return allaStorlekar;
     }
     
-    public List<Färg> getFärger(String ID){
-        List<Färg> allaFärger = new ArrayList<>();
+    public Map<Integer, Färg> getFärger(String ID){
+        Map<Integer, Färg> allaFärger = new HashMap<>();
         String query = "select * from färg";
         if (ID.length() > 0)
             query = "select * from färg where ID = ?";
@@ -174,7 +174,7 @@ public class Anslutning {
             while(rs.next()){
                 Färg temp = new Färg();
                 temp.setNamn(rs.getString("namn"));
-                allaFärger.add(temp);
+                allaFärger.put(rs.getInt("ID"), temp);
             }
         }   catch (SQLException ex) {
             ex.printStackTrace();
@@ -184,6 +184,7 @@ public class Anslutning {
     
     public List<Modell> getModeller(String ID){
         List<Modell> allaModeller = new ArrayList<>();
+        Map<Integer, Märke> märken = getMärken("");
         String query = "select * from modell";
         if(ID.length() > 0)
             query = "select * from modell where ID = ?";
@@ -198,7 +199,7 @@ public class Anslutning {
                 temp.setModellID(rs.getInt("ID"));
                 temp.setNamn(rs.getString("namn"));
                 temp.setPris(rs.getInt("pris"));
-                temp.setMärke(getMärken(String.valueOf(rs.getInt("märkeID"))).get(0));
+                temp.setMärke(märken.get(rs.getInt("märkeID")));
                 temp.setKategorier(getAllaKategorierFörSpecifikModell(temp.getModellID()));
                 allaModeller.add(temp);
             }
@@ -210,6 +211,8 @@ public class Anslutning {
     
     public List<Sko> getSkor(String ID){
         List<Sko> allaSkor = new ArrayList<>();
+        Map<Integer, Storlek> storlekar = getStorlekar("");
+        Map<Integer, Färg> färger = getFärger("");
         String query = "select * from sko";
         if(ID.length() > 0){
             query = "select * from sko where ID = ?";
@@ -224,8 +227,8 @@ public class Anslutning {
                 Sko temp = new Sko();
                 Modell m = getModeller(String.valueOf(rs.getInt("modellID"))).get(0);
                 temp.setSkoID(rs.getInt("ID"));
-                temp.setStorlek(getStorlekar(String.valueOf(rs.getInt("storlekID"))).get(0));
-                temp.setFärg(getFärger(String.valueOf(rs.getInt("färgID"))).get(0));
+                temp.setStorlek(storlekar.get(rs.getInt("storlekID")));
+                temp.setFärg(färger.get(rs.getInt("färgID")));
                 temp.setAntal(getLagerStatus(rs.getInt("ID")));
                 temp.setNamn(m.getNamn());
                 temp.setPris(m.getPris());
@@ -249,11 +252,13 @@ public class Anslutning {
                 stmt.setString(1, modellID);
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
+                Map<Integer, Storlek> storlekar = getStorlekar(String.valueOf(rs.getInt("storlekID")));
+                Map<Integer, Färg> färger = getFärger(String.valueOf(rs.getInt("färgID")));
                 Sko temp = new Sko();
                 Modell m = getModeller(String.valueOf(rs.getInt("modellID"))).get(0);
                 temp.setSkoID(rs.getInt("ID"));
-                temp.setStorlek(getStorlekar(String.valueOf(temp.getSkoID())).get(0));
-                temp.setFärg(getFärger(String.valueOf(rs.getInt("färgID"))).get(0));
+                temp.setStorlek(storlekar.get(rs.getInt("storlekID")));
+                temp.setFärg(färger.get(rs.getInt("färgID")));
                 temp.setAntal(getLagerStatus(rs.getInt("ID")));
                 temp.setNamn(m.getNamn());
                 temp.setPris(m.getPris());
