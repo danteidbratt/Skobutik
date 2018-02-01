@@ -137,14 +137,16 @@ public class Skobutik {
                     .collect(Collectors.toList());
             System.out.println("\nVälj Beställning:\n");
             alternatives = generateMapFromList(stuff);
+            addNewAlternative();
             printAlternatives(alternatives);
-            System.out.println("[" + (beställningar.size()+1) + "] Ny Beställning\n");
             if(!isValidInput(scanner.nextLine()))
                 return;
-            for (ViewBeställning b : beställningar) {
-                if (b.getDatum().compareTo(LocalDateTime.parse(alternatives.get(input), formatter)) == 0){
-                    inputBeställningID = String.valueOf(b.getID());
-                    break;
+            if (isTime(alternatives.get(input))){
+                for (ViewBeställning b : beställningar) {
+                    if (b.getDatum().compareTo(LocalDateTime.parse(alternatives.get(input), formatter)) == 0){
+                        inputBeställningID = String.valueOf(b.getID());
+                        break;
+                    }
                 }
             }
             System.out.println("\n" + controller.placeOrder(inputSkoID, inputBeställningID, kundID));
@@ -216,6 +218,19 @@ public class Skobutik {
         }
         stuff.clear();
         return theMap;
+    }
+    
+    public void addNewAlternative(){
+        alternatives.put(alternatives.size()+1, "Ny Beställning\n");
+    }
+    
+    private boolean isTime(String s){
+        try {
+            LocalDateTime.parse(s);
+        } catch (Exception e){
+            return false;
+        }
+        return true;
     }
     
     public boolean login(){
